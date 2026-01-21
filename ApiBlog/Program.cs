@@ -16,7 +16,10 @@ builder.Services.AddDbContext< ApplicationDbContext>(opciones =>
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 
 //Agregar automapper
-builder.Services.AddAutoMapper(typeof(BlogMapper));
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies());
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

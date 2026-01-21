@@ -54,7 +54,7 @@ namespace ApiBlog.Controllers
             return Ok(itemPostDto);
         }
 
-        [HttpPatch("{postId:int}", Name = "ActualizarPatchPost")]
+        [HttpPost]
         [ProducesResponseType(201, Type = typeof(PostCrearDto))]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -82,7 +82,61 @@ namespace ApiBlog.Controllers
                 return StatusCode(500, ModelState);
             }
 
-            return CreatedAtRoute("GetPost", new {postId = post.Id}, post);)
+            return CreatedAtRoute("GetPost", new {postId = post.Id}, post);
+        }
+
+        [HttpPatch("{postId:int}", Name = "ActualizarPatchPost")]
+        [ProducesResponseType(201, Type = typeof(PostCrearDto))]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult ActualizarPatchPost(int postId, [FromBody] PostActualizarDto actualizarPostDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (actualizarPostDto == null || postId != actualizarPostDto.Id)
+                return BadRequest(ModelState);
+
+            if (_postRepo.ExistePost(actualizarPostDto.Titulo))
+            {
+                ModelState.AddModelError("", "El post ya existe");
+                return StatusCode(404, ModelState);
+            }
+
+            var post = _mapper.Map<Post>(actualizarPostDto);
+
+            if (!_postRepo.ActualizarPost(post))
+            {
+                ModelState.AddModelError("", $"Algo salio mal al guardar el registro {post.Titulo}");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{postId:int}", Name = "BorrarPatchPost")]
+        [ProducesResponseType(201, Type = typeof(PostCrearDto))]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult BorrarPost(int postId)
+        {
+
+            if (!_postRepo.ExistePost(postId))
+                return NotFound();
+
+            var post = _postRepo.GetPost(postId);
+
+            if (!_postRepo.BorrarPost(post))
+            {
+                ModelState.AddModelError("", $"Algo salio mal al borrar el registro {post.Titulo}");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
         }
     }
 }

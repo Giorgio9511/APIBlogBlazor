@@ -12,5 +12,6 @@ namespace ApiBlog.Data
 
         //Agregar los modelos
         public DbSet<Post> Post {  get; set; }
+        public DbSet<Usuario> Usuario { get; set; }
     }
 }
