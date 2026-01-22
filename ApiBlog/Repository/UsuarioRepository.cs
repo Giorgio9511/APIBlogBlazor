@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using XSystem.Security.Cryptography;
 
 namespace ApiBlog.Repository
 {
@@ -15,9 +16,10 @@ namespace ApiBlog.Repository
         private readonly ApplicationDbContext _bd;
         private string claveSecreta;
 
-        public UsuarioRepository(ApplicationDbContext bd)
+        public UsuarioRepository(ApplicationDbContext bd, IConfiguration config)
         {
             _bd = bd;
+            claveSecreta = config.GetValue<string>("Jwt:Key");
         }
 
         public Usuario GetUsuario(int id)
@@ -41,7 +43,7 @@ namespace ApiBlog.Repository
 
         public async Task<UsuarioLoginRespuestaDto> Login(UsuarioLoginDto usuarioLoginDto)
         {
-            var passwordEncriptado = obtenermd5();
+            var passwordEncriptado = obtenermd5(usuarioLoginDto.Password);
             var usuario = _bd.Usuario.FirstOrDefault(
                 u => u.NombreUsuario.ToLower() == usuarioLoginDto.NombreUsuario.ToLower()
                 && u.Password == passwordEncriptado
@@ -70,11 +72,46 @@ namespace ApiBlog.Repository
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new (new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
+
+            var token = manejadorToken.CreateToken(tokenDescriptor);
+
+            UsuarioLoginRespuestaDto usuarioLoginRespuestaDto = new UsuarioLoginRespuestaDto()
+            {
+                Token = manejadorToken.WriteToken(token),
+                Usuario = usuario
+            };
+
+            return usuarioLoginRespuestaDto;
         }
 
-        public Task<Usuario> Registro(UsuarioRegistroDto usuarioRegistroDto)
+        public async Task<Usuario> Registro(UsuarioRegistroDto usuarioRegistroDto)
         {
-            throw new NotImplementedException();
+            var passwordEncriptado = obtenermd5(usuarioRegistroDto.Password);
+
+            Usuario usuario = new Usuario()
+            {
+                NombreUsuario = usuarioRegistroDto.NombreUsuario,
+                Nombre = usuarioRegistroDto.Nombre,
+                Email = usuarioRegistroDto.Email,
+                Password = usuarioRegistroDto.Password
+            };
+
+            _bd.Usuario.Add(usuario);
+            usuario.Password = passwordEncriptado;
+            await _bd.SaveChangesAsync();
+            return usuario;
+        }
+
+        //Metodos auxiliares
+        private string obtenermd5(string valor)
+        {
+            MD5CryptoServiceProvider x = new MD5CryptoServiceProvider();
+            byte[] data = System.Text.Encoding.UTF8.GetBytes(valor);
+            data = x.ComputeHash(data);
+            string resp = "";
+            for (int i = 0; i < data.Length; i++)
+                resp += data[i].ToString("x2").ToLower();
+            return resp;
         }
     }
 }
