@@ -1,0 +1,154 @@
+﻿@page "/editar-post/{Id:int}"
+@using ClienteBlazorWASM.Models;
+@using ClienteBlazorWASM.Models.ViewModels;
+@using ClienteBlazorWASM.Servicios.IServicio;
+@using System.Net.Http.Headers;
+@inject IPostsServicio postsServicio
+@inject IJSRuntime JsRuntime
+@inject NavigationManager navigationManager
+
+<h3 class="text-center">Editar Post</h3>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-7">
+                <h4 class="card-title text-dark">Editar Post</h4>
+            </div>
+        </div>
+    </div>
+    @if(editContext == null)
+    {
+        <div>
+            <p>Cargando...</p>
+        </div>
+    }
+    else
+    {
+        <div class="card-body">
+            <EditForm EditContext="editContext" OnValidSubmit="ManejadorOnEditarPost">
+                <DataAnnotationsValidator></DataAnnotationsValidator>
+                <ValidationSummary></ValidationSummary>
+                <div class="container">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-2">
+                                <label>Título:</label>
+                            </div>
+                            <div class="col-6">
+                                <InputText @bind-Value="EditarPost.Titulo" class="form-control" placeholder="Ingresa el título..."></InputText>
+                                <ValidationMessage For="() => EditarPost.Titulo"></ValidationMessage>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-2">
+                                <label>Descripción:</label>
+                            </div>
+                            <div class="col-6">
+                                <InputTextArea @bind-Value="EditarPost.Descripcion" class="form-control" placeholder="Ingresa la descripción..."></InputTextArea>
+                                <ValidationMessage For="() => EditarPost.Descripcion"></ValidationMessage>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-2">
+                                <label>Etiquetas:</label>
+                            </div>
+                            <div class="col-6">
+                                <InputText @bind-Value="EditarPost.Etiquetas" class="form-control" placeholder="Ingresa las etiquetas separadas por coma..."></InputText>
+                                <ValidationMessage For="() => EditarPost.Etiquetas"></ValidationMessage>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-6">
+                                <h4>Actualizar imagen post:</h4>
+                                <InputFile OnChange="ManejadorOnSubidaArchivo"></InputFile>
+                                <br />
+                                <br />
+                                @if (!string.IsNullOrEmpty(EditarPost.RutaImagen))
+                                {
+                                    <div>
+                                        <img src="@EditarPost.RutaImagen" style="width:300px;" />
+                                    </div>
+                                }
+                                <ValidationMessage For="() => EditarPost.RutaImagen"></ValidationMessage>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-4">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-check"></i> Guardar
+                                </button>
+                            </div>
+                            <div class="col-4">
+                                <NavLink href="posts" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left"></i> Volver
+                                </NavLink>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    }
+</div>
+
+@code {
+    private PostActualizarVM EditarPost { get; set; } = new PostActualizarVM();
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private EditContext editContext;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        EditarPost = await postsServicio.GetPost(Id);
+        editContext = new EditContext(EditarPost);
+    }
+
+    private async Task ManejadorOnEditarPost()
+    {
+        var editarPost = await postsServicio.ActualizarPost(Id, EditarPost);
+        await JsRuntime.ToastrSuccess("Post editado correctamente");
+        navigationManager.NavigateTo("posts");
+    }
+
+    private async Task ManejadorOnSubidaArchivo(InputFileChangeEventArgs e)
+    {
+        var imageFile = e.File;
+
+        if (imageFile == null)
+            return;
+
+        var resizedFile = await imageFile.RequestImageFileAsync("image/png", 1000, 700);
+        var stream = resizedFile.OpenReadStream(resizedFile.Size);
+
+        var content = new MultipartFormDataContent();
+
+        content.Add(
+            new StreamContent(stream),
+            "image",
+            imageFile.Name
+        );
+
+        EditarPost.RutaImagen = await postsServicio.SubidaImagen(content);
+
+        editContext.NotifyFieldChanged(
+            new FieldIdentifier(EditarPost, nameof(EditarPost.RutaImagen))
+        );
+
+        StateHasChanged();
+    }
+}

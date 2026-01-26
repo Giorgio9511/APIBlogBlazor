@@ -6,7 +6,7 @@ namespace ApiBlog.Repository.IRepository
     {
         ICollection<Post> GetPosts();
         Post GetPost(int id);
-        bool ExistePost(string nombre);
+        bool ExistePost(string nombre, int? id = null);
         bool ExistePost(int id);
         bool CrearPost(Post post);
         bool ActualizarPost(Post post);

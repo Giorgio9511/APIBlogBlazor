@@ -6,9 +6,9 @@ namespace ClienteBlazorWASM.Servicios.IServicio
     public interface IPostsServicio
     {
         public Task<IEnumerable<Post>> GetPosts();
-        public Task<Post> GetPost(int postId);
+        public Task<PostActualizarVM> GetPost(int postId);
         public Task<PostVM> CrearPost(PostVM post);
-        public Task<Post> ActualizarPost(int postId, Post post);
+        public Task<PostActualizarVM> ActualizarPost(int postId, PostActualizarVM post);
         public Task<bool> EliminarPost(int postId);
         public Task<string> SubidaImagen(MultipartFormDataContent content);
     }

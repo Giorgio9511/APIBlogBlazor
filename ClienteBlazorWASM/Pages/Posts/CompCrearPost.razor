@@ -1,9 +1,11 @@
 ﻿@page "/crear-post"
-@using ClienteBlazorWASM.Models
-@using ClienteBlazorWASM.Models.ViewModels
-@using ClienteBlazorWASM.Servicios.IServicio
+@using ClienteBlazorWASM.Models;
+@using ClienteBlazorWASM.Models.ViewModels;
+@using ClienteBlazorWASM.Servicios.IServicio;
+@using System.Net.Http.Headers;
 @inject IPostsServicio postsServicio
 @inject IJSRuntime JsRuntime
+@inject NavigationManager navigationManager
 
 <h3 class="text-center">Crear Post</h3>
 
@@ -16,7 +18,7 @@
         </div>
     </div>
     <div class="card-body">
-        <EditForm Model="CrearPost" OnValidSubmit="@(() => ManejadorOnCrearPost())">
+        <EditForm EditContext="editContext" OnValidSubmit="ManejadorOnCrearPost">
             <DataAnnotationsValidator></DataAnnotationsValidator>
             <ValidationSummary></ValidationSummary>
             <div class="container">
@@ -60,7 +62,15 @@
                     <div class="row">
                         <div class="col-6">
                             <h4>Imagen post:</h4>
-                            <InputText @bind-Value="CrearPost.RutaImagen" class="form-control" placeholder="Ingresa la ruta de la imagen..."></InputText>
+                            <InputFile OnChange="ManejadorOnSubidaArchivo"></InputFile>
+                            <br />
+                            <br />
+                            @if (!string.IsNullOrEmpty(CrearPost.RutaImagen))
+                            {
+                                <div>
+                                    <img src="@CrearPost.RutaImagen" style="width:300px;" />
+                                </div>
+                            }
                             <ValidationMessage For="() => CrearPost.RutaImagen"></ValidationMessage>
                         </div>
                     </div>
@@ -87,10 +97,44 @@
 
 @code {
     private PostVM CrearPost { get; set; } = new PostVM();
+    private EditContext editContext;
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(CrearPost);
+    }
 
     private async Task ManejadorOnCrearPost()
     {
         var crearPost = await postsServicio.CrearPost(CrearPost);
         await JsRuntime.ToastrSuccess("Post creado correctamente");
+        navigationManager.NavigateTo("posts");
+    }
+
+    private async Task ManejadorOnSubidaArchivo(InputFileChangeEventArgs e)
+    {
+        var imageFile = e.File;
+
+        if (imageFile == null)
+            return;
+
+        var resizedFile = await imageFile.RequestImageFileAsync("image/png", 1000, 700);
+        var stream = resizedFile.OpenReadStream(resizedFile.Size);
+
+        var content = new MultipartFormDataContent();
+
+        content.Add(
+            new StreamContent(stream),
+            "image",
+            imageFile.Name
+        );
+
+        CrearPost.RutaImagen = await postsServicio.SubidaImagen(content);
+
+        editContext.NotifyFieldChanged(
+            new FieldIdentifier(CrearPost, nameof(CrearPost.RutaImagen))
+        );
+
+        StateHasChanged();
     }
 }

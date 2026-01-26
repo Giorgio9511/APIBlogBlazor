@@ -5,6 +5,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace ApiBlog.Controllers
 {
@@ -97,7 +98,7 @@ namespace ApiBlog.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult ActualizarPatchPost(int postId, [FromBody] PostActualizarDto actualizarPostDto)
+        public async Task<IActionResult> ActualizarPatchPost(int postId, [FromBody] PostActualizarDto actualizarPostDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -105,13 +106,17 @@ namespace ApiBlog.Controllers
             if (actualizarPostDto == null || postId != actualizarPostDto.Id)
                 return BadRequest(ModelState);
 
-            if (_postRepo.ExistePost(actualizarPostDto.Titulo))
+            if (_postRepo.ExistePost(actualizarPostDto.Titulo, postId))
             {
                 ModelState.AddModelError("", "El post ya existe");
                 return StatusCode(404, ModelState);
             }
 
-            var post = _mapper.Map<Post>(actualizarPostDto);
+            var postDb = _postRepo.GetPost(postId);
+            if (postDb == null)
+                return NotFound();
+
+            var post = _mapper.Map(actualizarPostDto, postDb);
 
             if (!_postRepo.ActualizarPost(post))
             {

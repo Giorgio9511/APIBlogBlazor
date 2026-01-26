@@ -39,9 +39,10 @@ namespace ApiBlog.Repository
             return Guardar();
         }
 
-        public bool ExistePost(string nombre)
+        public bool ExistePost(string nombre, int? id = null)
         {
-            bool valor = _bd.Post.Any(c => c.Titulo.ToLower().Trim() == nombre.ToLower().Trim());
+            bool valor = _bd.Post.Any(c => c.Titulo.ToLower().Trim() == nombre.ToLower().Trim() 
+             && c.Id != id);
             return valor;
         }
 
