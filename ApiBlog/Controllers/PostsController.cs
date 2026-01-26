@@ -66,6 +66,7 @@ namespace ApiBlog.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult CrearPost([FromBody] PostCrearDto crearPostDto)
         {
+            Console.WriteLine("Entro a la api");
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 

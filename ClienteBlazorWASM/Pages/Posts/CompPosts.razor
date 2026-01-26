@@ -1,0 +1,84 @@
+﻿@page "/posts"
+@using ClienteBlazorWASM.Models
+@using ClienteBlazorWASM.Servicios.IServicio
+@inject IPostsServicio postsServicio
+
+<h1 class="text-center">Lista de Posts</h1>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-7">
+                <h4 class="card-title text-dark">Lista de Posts</h4>
+            </div>
+            <div class="col-3 offset-2">
+                <NavLink href="crear-post" class="btn btn-primary">
+                    <i class="bi bi-plus-circle-fill"></i> Nuevo post
+                </NavLink>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Título</th>
+                    <th>Descipción</th>
+                    <th>Etiquetas</th>
+                    <th>Imagen</th>
+                    <th>Fecha de creación</th>
+                    <th>Fecha de actualización</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if(Posts.Count() > 0)
+                {
+                    foreach (var post in Posts)
+                    {
+                        <tr>
+                            <td>@post.Id</td>
+                            <td>@post.Titulo</td>
+                            <td>@post.Descripcion</td>
+                            <td>@post.Etiquetas</td>
+                            <td>@post.RutaImagen</td>
+                            <td>@post.FechaCreacion</td>
+                            <td>@post.FechaActualizacion</td>
+                            <td>
+                                <NavLink href="@($"editar-post/{post.Id}")" class="btn btn-success">
+                                    <i class="bi bi-gear-fill"></i> Editar
+                                </NavLink>
+                                <button class="btn btn-danger" @onclick="() => ManejadorOnBorrar(post.Id)">
+                                    <i class="bi bi-trash-fill"></i> Editar
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td class="text-center" colspan="8">
+                            Cargando...
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    public IEnumerable<Post> Posts { get; set; } = new List<Post>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Posts = await postsServicio.GetPosts();
+    }
+
+    public void ManejadorOnBorrar(int postId)
+    {
+        
+    }
+}

@@ -1,0 +1,96 @@
+﻿@page "/crear-post"
+@using ClienteBlazorWASM.Models
+@using ClienteBlazorWASM.Models.ViewModels
+@using ClienteBlazorWASM.Servicios.IServicio
+@inject IPostsServicio postsServicio
+@inject IJSRuntime JsRuntime
+
+<h3 class="text-center">Crear Post</h3>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-7">
+                <h4 class="card-title text-dark">Nuevo Post</h4>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <EditForm Model="CrearPost" OnValidSubmit="@(() => ManejadorOnCrearPost())">
+            <DataAnnotationsValidator></DataAnnotationsValidator>
+            <ValidationSummary></ValidationSummary>
+            <div class="container">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-2">
+                            <label>Título:</label>
+                        </div>
+                        <div class="col-6">
+                            <InputText @bind-Value="CrearPost.Titulo" class="form-control" placeholder="Ingresa el título..."></InputText>
+                            <ValidationMessage For="() => CrearPost.Titulo"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-2">
+                            <label>Descripción:</label>
+                        </div>
+                        <div class="col-6">
+                            <InputTextArea @bind-Value="CrearPost.Descripcion" class="form-control" placeholder="Ingresa la descripción..."></InputTextArea>
+                            <ValidationMessage For="() => CrearPost.Descripcion"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-2">
+                            <label>Etiquetas:</label>
+                        </div>
+                        <div class="col-6">
+                            <InputText @bind-Value="CrearPost.Etiquetas" class="form-control" placeholder="Ingresa las etiquetas separadas por coma..."></InputText>
+                            <ValidationMessage For="() => CrearPost.Etiquetas"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-6">
+                            <h4>Imagen post:</h4>
+                            <InputText @bind-Value="CrearPost.RutaImagen" class="form-control" placeholder="Ingresa la ruta de la imagen..."></InputText>
+                            <ValidationMessage For="() => CrearPost.RutaImagen"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-4">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check"></i> Guardar
+                            </button>
+                        </div>
+                        <div class="col-4">
+                            <NavLink href="posts" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Volver
+                            </NavLink>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private PostVM CrearPost { get; set; } = new PostVM();
+
+    private async Task ManejadorOnCrearPost()
+    {
+        var crearPost = await postsServicio.CrearPost(CrearPost);
+        await JsRuntime.ToastrSuccess("Post creado correctamente");
+    }
+}
