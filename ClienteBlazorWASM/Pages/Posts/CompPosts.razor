@@ -2,6 +2,7 @@
 @using ClienteBlazorWASM.Models
 @using ClienteBlazorWASM.Servicios.IServicio
 @inject IPostsServicio postsServicio
+@inject IJSRuntime JsRuntime
 
 <h1 class="text-center">Lista de Posts</h1>
 
@@ -50,7 +51,7 @@
                                     <i class="bi bi-gear-fill"></i> Editar
                                 </NavLink>
                                 <button class="btn btn-danger" @onclick="() => ManejadorOnBorrar(post.Id)">
-                                    <i class="bi bi-trash-fill"></i> Editar
+                                    <i class="bi bi-trash-fill"></i> Borrar
                                 </button>
                             </td>
                         </tr>
@@ -69,16 +70,31 @@
     </div>
 </div>
 
+<ConfirmacionBorrado ProcesandoComponentePadre="estaProcesando" CambioConfirmacion="ClickConfirmacionBorrado"></ConfirmacionBorrado>
+
 @code {
     public IEnumerable<Post> Posts { get; set; } = new List<Post>();
+    //Para borrar
+    private bool estaProcesando { get; set; } = false;
+    private int? BorrarIdPost { get; set; } = null;
 
     protected override async Task OnInitializedAsync()
     {
         Posts = await postsServicio.GetPosts();
     }
 
-    public void ManejadorOnBorrar(int postId)
+    public async Task ManejadorOnBorrar(int postId)
     {
-        
+        BorrarIdPost = postId;
+        await JsRuntime.InvokeVoidAsync("MostrarModalConfirmacionBorrado");
+    }
+
+    public async Task ClickConfirmacionBorrado(bool confirmado)
+    {
+        estaProcesando = true;
+        if (confirmado && BorrarIdPost != null)
+        {
+            Post post = await postsServicio.GetPost(BorrarIdPost.Value);
+        }
     }
 }

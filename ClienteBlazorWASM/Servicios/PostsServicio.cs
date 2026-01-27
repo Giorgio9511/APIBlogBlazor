@@ -17,7 +17,7 @@ namespace ClienteBlazorWASM.Servicios
             _cliente = cliente;
         }
 
-        public async Task<PostActualizarVM> ActualizarPost(int postId, PostActualizarVM post)
+        public async Task<Post> ActualizarPost(int postId, Post post)
         {
             var content = JsonConvert.SerializeObject(post);
             var bodyContent = new StringContent(content, Encoding.UTF8, "application/json");
@@ -25,7 +25,7 @@ namespace ClienteBlazorWASM.Servicios
             if (response.IsSuccessStatusCode)
             {
                 var contentTemp = await response.Content.ReadAsStringAsync();
-                var result = JsonConvert.DeserializeObject<PostActualizarVM>(contentTemp);
+                var result = JsonConvert.DeserializeObject<Post>(contentTemp);
                 return result;
             }
             else
@@ -70,13 +70,13 @@ namespace ClienteBlazorWASM.Servicios
             }
         }
 
-        public async Task<PostActualizarVM> GetPost(int postId)
+        public async Task<Post> GetPost(int postId)
         {
             var response = await _cliente.GetAsync($"{Inicializar.UrlBaseAPI}api/posts/{postId}");
             if(response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                var post = JsonConvert.DeserializeObject<PostActualizarVM>(content);
+                var post = JsonConvert.DeserializeObject<Post>(content);
                 return post;
             }
             else
