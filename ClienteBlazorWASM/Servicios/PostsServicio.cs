@@ -57,7 +57,7 @@ namespace ClienteBlazorWASM.Servicios
 
         public async Task<bool> EliminarPost(int postId)
         {
-            var response = await _cliente.GetAsync($"{Inicializar.UrlBaseAPI}api/posts/{postId}");
+            var response = await _cliente.DeleteAsync($"{Inicializar.UrlBaseAPI}api/posts/{postId}");
             if (response.IsSuccessStatusCode)
             {
                 return true;

@@ -94,7 +94,12 @@
         estaProcesando = true;
         if (confirmado && BorrarIdPost != null)
         {
-            Post post = await postsServicio.GetPost(BorrarIdPost.Value);
+            //Post post = await postsServicio.GetPost(BorrarIdPost.Value);
+            await postsServicio.EliminarPost(BorrarIdPost.Value);
+            await JsRuntime.ToastrSuccess("Post borrado correctamente");
+            Posts = await postsServicio.GetPosts();
         }
+        await JsRuntime.InvokeVoidAsync("OcultarModalConfirmacionBorrado");
+        estaProcesando = false;
     }
 }
