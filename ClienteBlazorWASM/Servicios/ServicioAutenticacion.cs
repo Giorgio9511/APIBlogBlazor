@@ -37,7 +37,7 @@ namespace ClienteBlazorWASM.Servicios
             if(response.IsSuccessStatusCode)
             {
                 var token = resultado["result"]["token"].Value<string>();
-                var Usuario = resultado["result"]["usuario"].Value<string>();
+                var Usuario = resultado["result"]["usuario"]["nombreUsuario"].Value<string>();
 
                 await _localStorageService.SetItemAsync(Inicializar.Token_Local, token);
                 await _localStorageService.SetItemAsync(Inicializar.Datos_Usuario_Local, Usuario);
