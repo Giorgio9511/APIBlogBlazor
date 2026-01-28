@@ -9,17 +9,37 @@
                 <NavLink class="nav-link text-white" href="/" Match="NavLinkMatch.All">
                         Inicio
                 </NavLink>
-                <NavLink class="nav-link text-white" href="posts">
-                    Posts
-                </NavLink>
+                <AuthorizeView>
+                    <Authorized>
+                        <NavLink class="nav-link text-white" href="posts">
+                            Posts
+                        </NavLink>
+                    </Authorized>
+                </AuthorizeView>
             </ul>
             <ul class="navbar-nav mr-auto mb-2 mb-lg-0">
-                <NavLink class="nav-link text-white" href="registrarse">
-                    Registrarse
-                </NavLink>
-                <NavLink class="nav-link text-white" href="acceder">
-                    Acceder
-                </NavLink>
+                <AuthorizeView>
+                    <Authorized>
+                        <li class="nav-item p-0">
+                            <NavLink class="nav-link text-white">
+                                Bienvenido
+                            </NavLink>
+                        </li>
+                        <li class="nav-item p-0">
+                            <NavLink class="nav-link text-white" href="salir">
+                                Salir
+                            </NavLink>
+                        </li>
+                    </Authorized>
+                    <NotAuthorized>
+                        <NavLink class="nav-link text-white" href="registrarse">
+                            Registrarse
+                        </NavLink>
+                        <NavLink class="nav-link text-white" href="acceder">
+                            Acceder
+                        </NavLink>
+                    </NotAuthorized>
+                </AuthorizeView>
             </ul>
         </div>
     </div>
