@@ -75,7 +75,7 @@ namespace ApiBlog.Controllers
             return Ok(_respuestasAPI);
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -93,7 +93,7 @@ namespace ApiBlog.Controllers
             return Ok(listaUsuariosDto);
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpGet("{usuarioId:int}", Name = "GetUsuario")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

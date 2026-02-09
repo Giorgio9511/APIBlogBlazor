@@ -3,9 +3,11 @@
 @using ClienteBlazorWASM.Models.ViewModels;
 @using ClienteBlazorWASM.Servicios.IServicio;
 @using System.Net.Http.Headers;
+@using Microsoft.AspNetCore.Authorization
 @inject IPostsServicio postsServicio
 @inject IJSRuntime JsRuntime
 @inject NavigationManager navigationManager
+@attribute [Authorize]
 
 <h3 class="text-center">Crear Post</h3>
 

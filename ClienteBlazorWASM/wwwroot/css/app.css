@@ -101,3 +101,10 @@ a, .btn-link {
 code {
     color: #c02d76;
 }
+
+.imagen-header {
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-image: url('../imagenes/ramadan-iftar-food-2021-09-01-23-17-43-utc.jpg');
+    background-size: cover;
+}

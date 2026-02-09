@@ -58,7 +58,7 @@ namespace ApiBlog.Controllers
             return Ok(itemPostDto);
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPost]
         [ProducesResponseType(201, Type = typeof(PostCrearDto))]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -91,7 +91,7 @@ namespace ApiBlog.Controllers
             return CreatedAtRoute("GetPost", new {postId = post.Id}, post);
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPatch("{postId:int}", Name = "ActualizarPatchPost")]
         [ProducesResponseType(201, Type = typeof(PostCrearDto))]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -127,7 +127,7 @@ namespace ApiBlog.Controllers
             return NoContent();
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpDelete("{postId:int}", Name = "BorrarPatchPost")]
         [ProducesResponseType(201, Type = typeof(PostCrearDto))]
         [ProducesResponseType(StatusCodes.Status201Created)]

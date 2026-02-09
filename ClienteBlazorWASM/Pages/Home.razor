@@ -1,11 +1,33 @@
 ﻿@page "/"
+@using ClienteBlazorWASM.Models
+@using ClienteBlazorWASM.Servicios.IServicio
+@inject IPostsServicio postsServicio
 @inject IJSRuntime JsRuntime
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Inicio</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1 class="text-center">Últimos posts</h1>
 
-<h3>Blazor/JavaScript</h3>
+
+<div class="row">
+    @foreach(var post in Posts)
+    {
+        <div class="col-3 mt-3">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">@post.Titulo</h3>
+                </div>
+                <div class="card-body">
+                    <img src="@post.RutaImagen" class="img-fluid"/>
+                </div>
+                <div class="card-footer">
+                    <NavLink href="@($"detalle-post/{post.Id}")">Mas información...</NavLink>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+@* <h3>Blazor/JavaScript</h3>
 
 <div class="row mt-2">
     <div class="col-4">
@@ -46,41 +68,47 @@
     {
         <p>Confirmación pendiente</p>
     }
-</div>
+</div> *@
 
 @code {
-    private string MensajeConfirmacion = "Esta seguro de hacer click?";
-    private bool ConfirmarResultado { get; set; }
+    private IEnumerable<Post> Posts { get; set; } = new List<Post>();
 
-    private async Task DemoConfirmacion(string mensaje)
+    protected override async Task OnInitializedAsync()
     {
-        ConfirmarResultado = await JsRuntime.InvokeAsync<bool>("confirm", mensaje);
+        Posts = await postsServicio.GetPosts();
     }
+    // private string MensajeConfirmacion = "Esta seguro de hacer click?";
+    // private bool ConfirmarResultado { get; set; }
 
-    //Método para el toastr
-    private async Task DemoSuccess()
-    {
-        //await JsRuntime.InvokeVoidAsync("ShowToastr", "success", "Tarea completada!");
-        await JsRuntime.ToastrSuccess("Tarea completada!");
-    }
+    // private async Task DemoConfirmacion(string mensaje)
+    // {
+    //     ConfirmarResultado = await JsRuntime.InvokeAsync<bool>("confirm", mensaje);
+    // }
 
-    private async Task DemoError()
-    {
-        //await JsRuntime.InvokeVoidAsync("ShowToastr", "error", "Hubo un problema!");
-        await JsRuntime.ToastrError("Hubo un problema!");
-    }
+    // Método para el toastr
+    // private async Task DemoSuccess()
+    // {
+    //     await JsRuntime.InvokeVoidAsync("ShowToastr", "success", "Tarea completada!");
+    //     await JsRuntime.ToastrSuccess("Tarea completada!");
+    // }
 
-    //Método para el Sweet alert
-    private async Task DemoSuccessSwal()
-    {
-        await JsRuntime.InvokeVoidAsync("ShowSwal", "success", "Tarea completada!");
-        //await JsRuntime.ToastrSuccess("Tarea completada!");
-    }
+    // private async Task DemoError()
+    // {
+    //     await JsRuntime.InvokeVoidAsync("ShowToastr", "error", "Hubo un problema!");
+    //     await JsRuntime.ToastrError("Hubo un problema!");
+    // }
 
-    private async Task DemoErrorSwal()
-    {
-        await JsRuntime.InvokeVoidAsync("ShowSwal", "error", "Hubo un problema!");
-        //await JsRuntime.ToastrError("Hubo un problema!");
-    }
+    // Método para el Sweet alert
+    // private async Task DemoSuccessSwal()
+    // {
+    //     await JsRuntime.InvokeVoidAsync("ShowSwal", "success", "Tarea completada!");
+    //     await JsRuntime.ToastrSuccess("Tarea completada!");
+    // }
+
+    // private async Task DemoErrorSwal()
+    // {
+    //     await JsRuntime.InvokeVoidAsync("ShowSwal", "error", "Hubo un problema!");
+    //     await JsRuntime.ToastrError("Hubo un problema!");
+    // }
 }
 
